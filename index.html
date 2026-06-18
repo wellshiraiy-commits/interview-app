@@ -71,6 +71,8 @@ const phrases = [
 let current = 0;
 
 function startApp(){
+  // ★ スマホ音声ロック解除（ここを追加）
+document.getElementById("applause").play().catch(()=>{});
   document.getElementById("startScreen").style.display = "none";
   document.getElementById("completion").style.display = "none";
   showQuestion(0);
