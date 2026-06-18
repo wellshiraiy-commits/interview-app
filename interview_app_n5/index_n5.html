@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>面接練習アプリ（N5向け）</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      text-align: center;
+    }
+    .phrase {
+      border: 1px solid #ccc;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: #f9f9f9;
+    }
+    .answer-text {
+      font-size: 18px;
+      color: blue;
+      margin-top: 20px;
+      display: none;
+    }
+    #completion {
+      font-size: 22px;
+      color: green;
+      display: none;
+    }
+    button {
+      padding: 10px 18px;
+      font-size: 16px;
+      margin: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>面接（めんせつ）練習（れんしゅう）アプリ（N5向（む）け）</h1>
+
+<!-- スタート画面 -->
+<div id="startScreen">
+  <p>ボタンを押（お）して はじめてください</p>
+  <button onclick="startApp()">▶ スタート</button>
+</div>
+
+<div id="progress"></div>
+<div id="question_area"></div>
+
+<!-- 完了画面 -->
+<div id="completion">
+  🎉 お疲（つか）れ様（さま）！練習（れんしゅう）完了（かんりょう）！ 🎉<br><br>
+  <button onclick="backToStart()">最初（さいしょ）にもどる</button>
+</div>
+
+<audio id="applause" src="applause.mp3"></audio>
+
+<script>
+const phrases = [
+ {q:"こんにちは。お名前（なまえ）は？", a:"私（わたし）は〇〇（なまえ）です。", qfile:"q_01_name_n5.mp3", afile:"a_01_name_n5.mp3"},
+ {q:"出身（しゅっしん）はどこですか？", a:"私は○○（ミャンマー）から来（き）ました。", qfile:"q_02_from_n5.mp3", afile:"a_02_from_n5.mp3"},
+ {q:"趣味（しゅみ）は何（なん）ですか？", a:"私の趣味は○○（料理（りょうり）をつくること）です。", qfile:"q_03_hobby_n5.mp3", afile:"a_03_hobby_n5.mp3"},
+ {q:"好（す）きな食（た）べ物（もの）は何ですか？", a:"私の好きな食べ物は〇〇です。", qfile:"q_04_food_n5.mp3", afile:"a_04_food_n5.mp3"},
+ {q:"なぜ日本（にほん）で働（はたら）きたいですか？", a:"お金（かね）を稼（かせ）ぎたいです。", qfile:"q_05_reason_n5.mp3", afile:"a_05_reason_n5.mp3"},
+ {q:"この仕事（しごと）をしたいですか？", a:"はい、したいです。", qfile:"q_06_job_n5.mp3", afile:"a_06_job_n5.mp3"},
+ {q:"仕事で大事（だいじ）なことは何（なん）ですか？", a:"一生懸命（いっしょうけんめい）働（はたら）きます。", qfile:"q_07_value_n5.mp3", afile:"a_07_value_n5.mp3"},
+ {q:"チーム（ちーむ）で働（はたら）けますか？", a:"はい、チームで働けます。", qfile:"q_08_team_n5.mp3", afile:"a_08_team_n5.mp3"},
+ {q:"日本語（にほんご）の勉強（べんきょう）はしていますか？", a:"はい、勉強しています。", qfile:"q_09_japanese_n5.mp3", afile:"a_09_japanese_n5.mp3"},
+ {q:"最後（さいご）に何（なに）かありますか？", a:"ありがとうございました。", qfile:"q_10_thank_n5.mp3", afile:"a_10_thank_n5.mp3"}
+];
+
+let current = 0;
+
+function startApp(){
+  document.getElementById("startScreen").style.display = "none";
+  document.getElementById("completion").style.display = "none";
+  showQuestion(0);
+}
+
+function showQuestion(index){
+  current = index;
+  const p = phrases[index];
+
+  document.getElementById("progress").textContent =
+    `質問 ${index + 1} / ${phrases.length}`;
+
+  document.getElementById("question_area").innerHTML = `
+    <div class="phrase">
+      <p><strong>Q${index + 1}：</strong>${p.q}</p>
+
+      <button onclick="playQuestion('${p.qfile}')">▶ 質問（しつもん）を聞（き）く</button>
+      <button onclick="playAnswer('${p.afile}', ${index})">▶ 回答（かいとう）を聞（き）く</button>
+
+      <div id="answer" class="answer-text">${p.a}</div>
+
+      <br>
+      ${index > 0 ? `<button onclick="showQuestion(${index - 1})">⬅ 前</button>` : ""}
+      <button onclick="nextQuestion()">次の質問 ➡</button>
+    </div>
+  `;
+}
+
+function playQuestion(file){
+  new Audio(file).play();
+}
+
+function playAnswer(file, index){
+  const audio = new Audio(file);
+  audio.play();
+
+  audio.onended = () => {
+    document.getElementById("answer").style.display = "block";
+
+    // Q10だけ特別処理
+    if(index === phrases.length - 1){
+      document.getElementById("applause").play();
+      setTimeout(showCompletion, 2000);
+    }
+  };
+}
+
+function nextQuestion(){
+  if(current < phrases.length - 1){
+    showQuestion(current + 1);
+  }
+}
+
+function showCompletion(){
+  document.getElementById("question_area").innerHTML = "";
+  document.getElementById("progress").textContent = "";
+  document.getElementById("completion").style.display = "block";
+}
+
+function backToStart(){
+  document.getElementById("startScreen").style.display = "block";
+  document.getElementById("completion").style.display = "none";
+}
+</script>
+
+</body>
+</html>
